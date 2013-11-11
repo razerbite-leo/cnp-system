@@ -5,7 +5,7 @@
 		    success: function(o) {
 		    	if(o.is_successful) {
 		    		IS_INJURIES_TREATMENTS_TAB_CHANGE = false;
-		    		$('#injrtrtmnts_count_sidebar').show();
+		    		$('#injuries_treatments_sidebar_check').show();
 
 		    		window.location.hash = "economic-damages";
 					reload_content("economic-damages");

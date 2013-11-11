@@ -1492,6 +1492,25 @@ margin-bottom: 0;
 }
  
 
+div.submit-has-content {
+	background: none repeat scroll 0% 0% #3E8E7E;
+    width: 22px;
+    height: 21px;
+    margin-top: 1px;
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    font-family: arial;
+    font-size: 12px;
+}
+
+div.submit-is-check {
+    height: 23px;
+    width: 24px;
+    background-image: url("../images/check-sidebar.png");
+	background-repeat: no-repeat;
+}
+
 
 
 

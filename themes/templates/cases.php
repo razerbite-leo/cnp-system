@@ -35,7 +35,7 @@
 					<li class="<?php echo $scene_active; ?>"><a href="#">Scene</a></li>
 					<li class="<?php echo $documents_active; ?>"><a href="<?php echo url("cases/documents"); ?>">Documents</a></li>
 					<li class="<?php echo $photos_active; ?>"><a href="<?php echo url("cases/photos"); ?>">Photos</a></li>
-					<li><a href="#">Submit</a></li>
+					<li class="<?php echo $submit_active; ?>"><a href="<?php echo url("cases/submit"); ?>">Submit</a></li>
 				</ul>
 				<nav>
 					<ul>

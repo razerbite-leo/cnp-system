@@ -6,7 +6,7 @@
 		    success: function(o) {
 		    	if(o.is_successful) {
 		    		IS_NOTES_TAB_CHANGE = false;
-		    		//$('#economic_damages_count_sidebar').show();
+		    		$('#notes_sidebar_check').show();
 		  		}
 		    },
 		    beforeSubmit: function(o) {

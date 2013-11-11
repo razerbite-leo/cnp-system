@@ -56,14 +56,18 @@
 		<section class="accordionButton case_injuries_treatments super_sidebar">
 			<small>Injuries & Treatments</small>
 			<?php if(!$module['injuries_treatments']) { $display_injrtrtmnts = "display:none;"; } ?>
-			<div id="injrtrtmnts_count_sidebar" class="item_count_sidebar" style="<?php echo $display_injrtrtmnts; ?>">1</div>
+			<img id="injuries_treatments_sidebar_check" style="<?php echo $display_injrtrtmnts; ?>" class="sidebar_check" src="<?php echo $imgsrc; ?>">
 		</section>
 		<section class="accordionButton case_economic_damages super_sidebar">
 			Economic Damages
 			<?php if(!$module['economic_damages']) { $display_economic_damages = "display:none;"; } ?>
-			<div id="economic_damages_count_sidebar" class="item_count_sidebar" style="<?php echo $display_economic_damages; ?>">1</div>
+			<img id="economic_damages_sidebar_check" style="<?php echo $display_economic_damages; ?>" class="sidebar_check" src="<?php echo $imgsrc; ?>">
 		</section>
-		<section class="accordionButton case_notes super_sidebar">Notes</section>
+		<section class="accordionButton case_notes super_sidebar">
+			Notes
+			<?php if(!$module['notes']) { $display_notes = "display:none;"; } ?>
+			<img id="notes_sidebar_check" style="<?php echo $display_notes; ?>" class="sidebar_check" src="<?php echo $imgsrc; ?>">
+		</section>
 	</nav>
 	<?php } ?>
 </aside>

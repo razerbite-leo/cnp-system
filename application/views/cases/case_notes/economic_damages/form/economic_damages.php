@@ -9,7 +9,7 @@
 		    success: function(o) {
 		    	if(o.is_successful) {
 		    		IS_ECONOMIC_DAMAGE_TAB_CHANGE = false;
-		    		$('#economic_damages_count_sidebar').show();
+		    		$('#economic_damages_sidebar_check').show();
 
 		    		window.location.hash = "notes";
 					reload_content("notes");

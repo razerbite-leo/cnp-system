@@ -2354,9 +2354,8 @@ class Cases extends CI_Controller {
 				$tz 	= Timezone::findById($firm['timezone_id']);
 
 				$sign 	= ($tz['sign'] == "neg" ? '-' : '+');
-				date_default_timezone_set("Etc/GMT{$sign}".$tz['offset']);
+				date_default_timezone_set($tz['timezone_code']);
 
-				#date_default_timezone_set("Asia/Manila");
 				$record = array(
 					"is_accepted" 	=> YES,
 					"date_accepted" => date("Y-m-d H:i:s",time()),
@@ -2416,6 +2415,7 @@ class Cases extends CI_Controller {
 		Jquery::select2();
 		Jquery::plup_uploader();
 
+		$data['case_code'] = $_SESSION['cases']['code'];
 		$data['photos_active'] = "tab-block-active";
 
 		$data['page_title'] = "CNP :: Manage Photos";
@@ -2492,7 +2492,37 @@ class Cases extends CI_Controller {
 		}
 	}
 
-	function a() {
-		debug_array($_SESSION['tmp_cases']['photo']);
+	function submit() {
+		$this->check_user_login();
+
+		Engine::appStyle('bootstrap.min.css');
+
+		Bootstrap::modal();
+		Bootstrap::datetimepicker();
+		
+		Engine::appStyle('cases.css');
+		Engine::appStyle('general.css');
+		Engine::appScript('javascript.js');
+		Engine::appScript('confirmation.js');
+		Engine::appScript('cases-photos.js');
+
+		Jquery::form();
+		Jquery::datatable();
+		Jquery::tipsy();
+		Jquery::select2();
+		Jquery::plup_uploader();
+
+		$data['case_code'] 	= $_SESSION['cases']['code'];
+		$data['cn'] 		= $_SESSION['tmp_cases'];
+
+		$data['submit_active'] = "tab-block-active";
+
+		$data['page_title'] = "CNP :: Manage Photos";
+		$data['session']	= $session = $_SESSION['cnp']['login'];
+		$data['firm'] 		= $firm = Firm::findById($this->encrypt->decode($session['firm_id']));
+		$data['user'] 		= $user = User::findById($this->encrypt->decode($session['user_id']));
+
+		$this->load->view('cases/submit/index',$data);
 	}
+
 }
