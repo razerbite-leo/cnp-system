@@ -1,0 +1,94 @@
+.gray {color:gray;}
+.hidden {display: none;}
+#alert_confirmation_wrapper {}
+
+table.datatable {font-size: 12px;}
+table.datatable th {text-align: center; padding-top:1%;}
+
+ul.inline_3 {}
+ul.inline_3 li { float:left; padding-left: 1%;}
+
+.display_image_holder {height:120px; width: 120px; padding: 5% !important;}
+.display_firm_logo_holder { width: 200px; padding: 5% !important;}
+.icon {cursor: pointer;}
+
+div#upload_document_holder {float:right; padding-right: 2%;}
+.logo_holder { height: 30px !important; width: 150px !important; padding: 10% 0 0 12% !important;  }
+
+.sidebar_check {float: right; margin-right: 5%; height: 20px; width: 20px;}
+
+div.item_count_sidebar {
+background: red;
+width: 20px;
+height: 20px;
+float: right;
+margin-right: 5%;
+border-radius: 50%;
+-moz-border-radius: 50%;
+-webkit-border-radius: 50%;
+float:right;
+color:white;
+text-align: center;
+font-family: arial;
+font-size: 12px;
+}
+
+label.no-bootsrap {display:inline !important;}
+div.party_list_sidebar div {padding-left: 10%; padding-bottom:10%; margin-top:-10%; height: 150px; overflow-y:auto;}
+h3.party_name_sidebar {font-size:15px; text-decoration: underline;}
+ul.party_item{list-style: none outside none; margin: 0; padding: 0;}
+ul.party_item li{float:left; padding-right:10px;}
+a.party_item {text-decoration: none;}
+
+div.client_group_form .check {margin:0 5% 5% 0 !important;}
+
+div.id-cp {padding-bottom: 1%}
+div.id-cp .check {margin:0 0 1px 1% !important}
+
+.action-icon {cursor: pointer;}
+
+#content .content-header .icon, #content .content-header li a {
+	cursor: pointer;
+}
+
+div.citations_item_wrapper {padding-left:170px; padding-top:-10px;}
+div.citations_item_wrapper .check {margin-bottom:5px;}
+div.trip_purpose_wrapper {padding-left:170px; padding-top:-10px;}
+div.trip_purpose_wrapper .check{margin-bottom:5px;}
+
+div.insurance_list_sidebar div {padding-left: 10%; padding-bottom:10%; margin-top:-10%; height: 150px; overflow-y:auto;}
+h3.insurance_name_sidebar {font-size:15px; text-decoration: underline;}
+ul.insurance_item{list-style: none outside none; margin: 0; padding: 0;}
+ul.insurance_item li{float:left; padding-right:10px;}
+a.insurance_item {text-decoration: none;}
+
+div.insurance_content span.insurance_value {font-size:13px;}
+
+div.vehicle_rental_wrapper {padding-left:170px; padding-top:-10px;}
+div.vehicle_rental_wrapper .check{margin-bottom:5px;}
+
+div.photo_taken_wrapper .check {margin:0 5% 5% 0 !important;}
+div.vehicle_condition_wrapper {padding-left:170px; padding-top:-10px;}
+div.vehicle_condition_wrapper .check2 {margin-bottom:5px;}
+
+div.vehicle_list_sidebar div {padding-left: 10%; padding-bottom:10%; margin-top:-10%; height: 150px; overflow-y:auto;}
+h3.vehicle_name_sidebar {font-size:15px; text-decoration: underline;}
+ul.vehicle_item{list-style: none outside none; margin: 0; padding: 0;}
+ul.vehicle_item li{float:left; padding-right:10px;}
+a.vehicle_item {text-decoration: none;}
+
+div.hospital_er_modal .check {margin:0 5% 5% 0 !important;}
+.no-width {width:100% !important;}
+
+.big_save_inner {width: 725px !important; background: none repeat scroll 0 0 #005B96 !important;}
+.case_availability_wrapper_l {float: left; width: 49%;}
+.case_availability_wrapper_r {float: right; width: 49%; padding-right:10px;}
+
+.case_logo_holder {height: 30px !important; width: 150px !important;}
+
+tr.case_alloted_active td {background-color:#D8D8D8 !important;}
+
+
+#signaturepad_wrapper {height:150px !important; width:460px !important; float: left;}
+.disclaimer { float: left; width: 300px; margin-left: 10px;}
+.clear-signature { margin-top:15px;}

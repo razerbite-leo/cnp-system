@@ -1,0 +1,16 @@
+.gray {color:gray;}
+.hidden {display: none;}
+#alert_confirmation_wrapper {}
+
+table.datatable {font-size: 12px;}
+table.datatable th {text-align: center; padding-top:1%;}
+
+ul.inline_3 {}
+ul.inline_3 li { float:left; padding-left: 1%;}
+
+.display_image_holder {height:120px; width: 120px; padding: 5% !important;}
+.icon {cursor: pointer;}
+
+div#upload_document_holder {float:right; padding-right: 2%;}
+.logo_holder { height: auto !important; width: 150px !important; padding: 10% 0 0 12% !important;  }
+

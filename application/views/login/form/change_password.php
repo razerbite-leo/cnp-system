@@ -1,0 +1,1 @@
+<?php include('themes/templates/change_password.php'); ?>
