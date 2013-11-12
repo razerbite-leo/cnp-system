@@ -2350,11 +2350,7 @@ class Cases extends CI_Controller {
 
 				$document 	= Document::findById($key);
 				
-				$firm 	= Firm::findById($document['firm_id']);
-				$tz 	= Timezone::findById($firm['timezone_id']);
-
-				$sign 	= ($tz['sign'] == "neg" ? '-' : '+');
-				date_default_timezone_set($tz['timezone_code']);
+				Timezone::setDefaultTimeZone($document['firm_id']);
 
 				$record = array(
 					"is_accepted" 	=> YES,
@@ -2525,4 +2521,75 @@ class Cases extends CI_Controller {
 		$this->load->view('cases/submit/index',$data);
 	}
 
+	function finalize_user_case() {
+		#$post = $this->validate_ajax_post();
+		#if($post) {
+		debug_array($_SESSION['tmp_cases']);
+
+			$case_code 	= $_SESSION['cases']['code'];
+			$session 	= $_SESSION['cnp']['login'];
+
+			$user_id = (int) $this->encrypt->decode($session['user_id']);
+			$firm_id = (int) $this->encrypt->decode($session['firm_id']);
+			
+			Timezone::setDefaultTimeZone($firm_id);
+
+			$record = array(
+				"firm_id" 		=> $firm_id,
+				"user_id" 		=> $user_id,
+				"case_code" 	=> $case_code,
+				"status" 		=> ACTIVE,
+				"is_archive" 	=> YES,
+				"date_created" 	=> date("Y-m-d H:i:s"),
+				"modified_by" 	=> $user_id,
+			);
+
+			$case_id = CN_Case::save($record);
+
+			$case_details = array(
+				"case_id" 		=> $case_id,
+				"case_code" 	=> $case_code,
+				"firm_id" 		=> $firm_id,
+				"user_id" 		=> $user_id,
+			);
+			
+			$this->save_general_info($case_details);
+		#}
+	}
+
+
+	function save_general_info($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['general'];
+
+		if($session) {
+			$record = array(
+				"case_id"			 				=> $obj['case_id'],
+				"case_code" 						=> $obj['case_code'],
+				"firm_id" 							=> $obj['firm_id'],
+				"user_id" 							=> $obj['user_id'],
+				"investigator_name"					=> $session['investigator_name'],
+				"investigation_date" 				=> $session['investigation_date'],
+				"case_source" 						=> $session['case_source'],
+				"referral_source" 					=> $session['referral_source'],
+				"previous_representation" 			=> $session['previous_representation'],
+				"reasons_representation_terminated" => $session['reasons_representation_terminated'],
+				"settlement_received" 				=> $session['settlement_received'],
+				"date_created" 						=> date("Y-m-d H:i:s"),
+				"last_modified_by" 					=> $obj['user_id'],
+			);
+
+			CN_General_Information::save($record);
+		}
+	}
+
+	function save_parties($obj) {
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['parties'];
+
+		foreach($parties as $key=>$value):
+			
+		endforeach;
+	}
 }

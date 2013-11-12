@@ -21,15 +21,34 @@ define("USER_LEVEL","User Level");
 |
 */
 
+/*
+	STATUS
+*/
+
 define("YES","Yes");
 define("NO","No");
 define("ACTIVE","Active");
 define("INACTIVE","Inactive");
 
+
+/*
+	PARTIES
+*/
+define("CLIENT","Client");
+define("DEFENDANT","Defendant");
+
+define("OWNER","Owner");
+
+/*
+	DOCUMENT
+*/
 define("DOCUMENT_SET","Document Set");
 define("DOCUMENT_IMAGE","Document Image");
 define("DOCUMENT","Document");
 
+/*
+	TABLES
+*/
 define('CNP_USER','cnp_user');
 define('CNP_USER_CONTACT_LIST','cnp_user_contact_list');
 define('CNP_FIRM','cnp_firm');
@@ -41,6 +60,9 @@ define('CNP_CASE_FIRM_SUBSCRIPTION','cnp_case_firm_subscription');
 define('CNP_PASSWORD_RECOVERY','cnp_password_recovery');
 define('CNP_TIMEZONE','cnp_timezone');
 define('CNP_CASE_DOCUMENT','cnp_case_document');
+
+define('CNP_CASE','cnp_case');
+define('CNP_CASE_GENERAL_INFORMATION','cnp_case_general_information');
 
 define("ORIGINAL_DOC","Original");
 define("BRANCH_DOC","Branch");

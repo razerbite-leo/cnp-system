@@ -60,16 +60,16 @@
 			<form id="add_party_form" name="add_party_form" method="post" action="<?php echo url('cases/add_party'); ?>" enctype="multipart/form-data">
 				<p>Party Type</p>
 				<select id="party_type" name="party_type" class="select party_form" onchange="javascript:show_client_form();">
-					<option value="Client">Client</option>
-					<option value="Defendant">Defendant</option>
+					<option value="<?php echo CLIENT; ?>">Client</option>
+					<option value="<?php echo DEFENDANT; ?>">Defendant</option>
 				</select>
 				<section class="clear"></section>
 
 				<div class="hidden defendant_group_form">
 					<p>Role of Party</p>
 					<select id="party_role" name="party_role" class="select party_form">
-						<option value="Option 1">Please Select One</option>
-						<option value="Option 2">Owner</option>
+						<option value="">Please Select One</option>
+						<option value="<?php echo OWNER; ?>">Owner</option>
 					</select>
 					<section class="clear"></section>
 				</div>

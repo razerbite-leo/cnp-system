@@ -1,9 +1,9 @@
 <?php 
-class Timezone {
+class CN_Case {
 
 	public static function findById($id) {
 		$sql = " 
-			SELECT * FROM " . CNP_TIMEZONE . "
+			SELECT * FROM " . CNP_CASE . "
 			WHERE
 				id = " . Mapper::safeSql($id) . "
 
@@ -14,20 +14,11 @@ class Timezone {
 
 	public static function findAll() {
 		$sql = " 
-			SELECT * FROM " . CNP_TIMEZONE . "
+			SELECT * FROM " . CNP_CASE . "
 		";
 		return Mapper::runSql($sql,true,true);
 	}
 
-	public static function setDefaultTimeZone($firm_id) {
-		$firm 	= Firm::findById($firm_id);
-
-		$tz 	= self::findById($firm['timezone_id']);
-
-		$sign 	= ($tz['sign'] == "neg" ? '-' : '+');
-
-		date_default_timezone_set($tz['timezone_code']);
-	}
 
 	public static function save($record,$id) {
 		foreach($record as $key=>$value):
@@ -35,16 +26,16 @@ class Timezone {
 		endforeach;
 
 		if($id) {
-			$sqlstart 	= " UPDATE " . CNP_TIMEZONE . " SET ";
+			$sqlstart 	= " UPDATE " . CNP_CASE . " SET ";
 			$sqlend		= " WHERE id = " . Mapper::safeSql($id);
 		} else {
-			$sqlstart 	=  " INSERT INTO " . CNP_TIMEZONE . " SET ";
+			$sqlstart 	=  " INSERT INTO " . CNP_CASE . " SET ";
 			$sqlend		= "";
 		}
 
 		$sqlbody 	= implode($arr," , ");
 		$sql 		= $sqlstart.$sqlbody.$sqlend;
-
+	
 		Mapper::runSql($sql,false);
 		if($id) {
 			return $id;
@@ -55,7 +46,7 @@ class Timezone {
 
 	public static function delete($id) {
 		$sql = "
-			DELETE FROM " . CNP_TIMEZONE . "
+			DELETE FROM " . CNP_CASE . "
 			WHERE id = " . Mapper::safeSql($id) . "
 		";
 		Mapper::runSql($sql,false);
