@@ -19,6 +19,17 @@ class CN_General_Information {
 		return Mapper::runSql($sql,true,true);
 	}
 
+	public static function findByCaseCode($params) {
+		$sql = " 
+			SELECT * FROM " . CNP_CASE_GENERAL_INFORMATION . "
+			WHERE
+				case_code = " . Mapper::safeSql($params['case_code']) . "
+			LIMIT 1
+		";
+
+		return Mapper::runSql($sql,true,false);
+	}
+
 
 	public static function save($record,$id) {
 		foreach($record as $key=>$value):
@@ -35,7 +46,7 @@ class CN_General_Information {
 
 		$sqlbody 	= implode($arr," , ");
 		$sql 		= $sqlstart.$sqlbody.$sqlend;
-		
+
 		Mapper::runSql($sql,false);
 		if($id) {
 			return $id;

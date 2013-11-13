@@ -30,6 +30,9 @@ define("NO","No");
 define("ACTIVE","Active");
 define("INACTIVE","Inactive");
 
+define("PENDING","Pending");
+define("SAVED","Saved");
+
 
 /*
 	PARTIES
@@ -60,9 +63,14 @@ define('CNP_CASE_FIRM_SUBSCRIPTION','cnp_case_firm_subscription');
 define('CNP_PASSWORD_RECOVERY','cnp_password_recovery');
 define('CNP_TIMEZONE','cnp_timezone');
 define('CNP_CASE_DOCUMENT','cnp_case_document');
+define('CNP_CASE_PARTIES_INVOLVED_CONTACT_LIST','cnp_case_parties_involved_contact_list');
+define('CNP_CASE_PARTIES_INVOLVED_CONTACT_PERSON_LIST','cnp_case_parties_involved_contact_person_list');
+define('CNP_CASE_INCIDENT_DESCRIPTION','cnp_case_incident_description');
+define('CNP_CASE_INSURANCE','cnp_case_insurance');
 
 define('CNP_CASE','cnp_case');
 define('CNP_CASE_GENERAL_INFORMATION','cnp_case_general_information');
+define('CNP_CASE_PARTIES_INVOLVED','cnp_case_parties_involved');
 
 define("ORIGINAL_DOC","Original");
 define("BRANCH_DOC","Branch");

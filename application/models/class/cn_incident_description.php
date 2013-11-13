@@ -1,9 +1,9 @@
 <?php 
-class CN_Case {
+class CN_Incident_Description {
 
 	public static function findById($id) {
 		$sql = " 
-			SELECT * FROM " . CNP_CASE . "
+			SELECT * FROM " . CNP_CASE_INCIDENT_DESCRIPTION . "
 			WHERE
 				id = " . Mapper::safeSql($id) . "
 
@@ -14,14 +14,14 @@ class CN_Case {
 
 	public static function findAll() {
 		$sql = " 
-			SELECT * FROM " . CNP_CASE . "
+			SELECT * FROM " . CNP_CASE_INCIDENT_DESCRIPTION . "
 		";
 		return Mapper::runSql($sql,true,true);
 	}
 
 	public static function findByCaseCode($params) {
 		$sql = " 
-			SELECT * FROM " . CNP_CASE . "
+			SELECT * FROM " . CNP_CASE_INCIDENT_DESCRIPTION . "
 			WHERE
 				case_code = " . Mapper::safeSql($params['case_code']) . "
 			LIMIT 1
@@ -37,16 +37,16 @@ class CN_Case {
 		endforeach;
 
 		if($id) {
-			$sqlstart 	= " UPDATE " . CNP_CASE . " SET ";
+			$sqlstart 	= " UPDATE " . CNP_CASE_INCIDENT_DESCRIPTION . " SET ";
 			$sqlend		= " WHERE id = " . Mapper::safeSql($id);
 		} else {
-			$sqlstart 	=  " INSERT INTO " . CNP_CASE . " SET ";
+			$sqlstart 	=  " INSERT INTO " . CNP_CASE_INCIDENT_DESCRIPTION . " SET ";
 			$sqlend		= "";
 		}
 
 		$sqlbody 	= implode($arr," , ");
 		$sql 		= $sqlstart.$sqlbody.$sqlend;
-	
+		
 		Mapper::runSql($sql,false);
 		if($id) {
 			return $id;
@@ -57,7 +57,7 @@ class CN_Case {
 
 	public static function delete($id) {
 		$sql = "
-			DELETE FROM " . CNP_CASE . "
+			DELETE FROM " . CNP_CASE_INCIDENT_DESCRIPTION . "
 			WHERE id = " . Mapper::safeSql($id) . "
 		";
 		Mapper::runSql($sql,false);

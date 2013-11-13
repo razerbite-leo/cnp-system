@@ -25,6 +25,7 @@ class Cases extends CI_Controller {
 		$data['session']	= $session = $_SESSION['cnp']['login'];
 		$data['firm'] 		= $firm = Firm::findById($this->encrypt->decode($session['firm_id']));
 		$data['user'] 		= $user = User::findById($this->encrypt->decode($session['user_id']));
+
 		$this->load->view('cases/manage_cases',$data);
 	}
 
@@ -121,7 +122,46 @@ class Cases extends CI_Controller {
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
+		$case_details = $this->save_user_case($_SESSION['tmp_cases']['general']);
+		$this->save_general_info($case_details);
+
 		echo json_encode($json);
+	}
+
+	function save_general_info($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['general'];
+
+		if($session) {
+
+			$gi = CN_General_Information::findByCaseCode(array("case_code" => $case_code));
+
+			$record = array(
+				"case_id"			 				=> $obj['case_id'],
+				"case_code" 						=> $obj['case_code'],
+				"firm_id" 							=> $obj['firm_id'],
+				"user_id" 							=> $obj['user_id'],
+				"investigator_name"					=> $session['investigator_name'],
+				"investigation_date" 				=> $session['investigation_date'],
+				"case_source" 						=> $session['case_source'],
+				"referral_source" 					=> $session['referral_source'],
+				"previous_representation" 			=> $session['previous_representation'],
+				"reasons_representation_terminated" => $session['reasons_representation_terminated'],
+				"settlement_received" 				=> $session['settlement_received'],
+				"last_modified_by" 					=> $obj['user_id'],
+			);
+
+			if($gi) {
+				CN_General_Information::save($record, $gi['id']);
+			} else {
+				$arr = array(
+					"date_created" => date("Y-m-d H:i:s",time()),
+				);
+				$record = array_merge($record,$arr);
+				CN_General_Information::save($record);
+			}
+		}
 	}
 
 	function parties() {
@@ -294,11 +334,103 @@ class Cases extends CI_Controller {
 				$json['message'] 		= "Successfully updated!";
 			}
 
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['parties']);
+			$this->save_parties_involved($case_details);
+
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 		echo json_encode($json);
+	}
+
+	function save_parties_involved($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['parties'];
+
+		if($session && $obj && $case_code) {
+
+			$pi = CN_Parties_Involved::findByCaseCode(array("case_code"=>$case_code));
+
+			$is_deleted = false;
+			foreach($session as $key=>$value):
+				$record = array(
+					"case_id"			 	=> $obj['case_id'],
+					"case_code" 			=> $obj['case_code'],
+					"firm_id" 				=> $obj['firm_id'],
+					"user_id" 				=> $obj['user_id'],
+					"party_type"			=> $value['party_type'],
+					"party_roles" 			=> $value['party_roles'],
+					"prefix_title" 			=> $value['prefix_title'],
+					"client_name" 			=> $value['client_name'],
+					"gender" 				=> $value['gender'],
+					"relationship" 			=> $value['relationship'],
+					"relationship_other" 	=> $value['relationship_other'],
+					"ssn" 					=> $value['ssn'],
+					"birthdate" 			=> $value['birthdate'],
+					"address" 				=> $value['address'],
+					"city" 					=> $value['city'],
+					"state" 				=> $value['state'],
+					"zip" 					=> $value['zip'],
+					"occupation" 			=> $value['occupation'],
+					"ss" 					=> $value['ss'],
+					"ssd" 					=> $value['pb']['ssd'],
+					"medical_id" 			=> $value['pb']['medical_id'],
+					"medicare" 				=> $value['pb']['medicare'],
+					"housing_food" 			=> $value['pb']['housing_food'],
+					"others" 				=> $value['ck_other'],
+					"public_benefits_other" => $value['pb_other'],
+					"image_path" 			=> $value['filename'],
+					"image_filename" 		=> $value['filepath'],
+					"date_created" 			=> date("Y-m-d H:i:s",time()),
+					"last_update_by" 		=> $obj['user_id'],
+				);
+
+				if($pi) {
+					if(!$is_deleted) {
+
+						CN_Parties_Involved::deleteByCaseCode(array("case_code"=>$case_code));
+						CN_Parties_Involved_Contact_List::deleteByCaseCode(array("case_code"=>$case_code));
+						CN_Parties_Involved_Contact_Person_List::deleteByCaseCode(array("case_code"=>$case_code));
+
+						$is_deleted = true;
+					}
+				}
+
+				$party_id = CN_Parties_Involved::save($record);
+
+				foreach($value['contact_information'] as $key2=>$value2):
+					$record2 = array(
+						"party_id"			=> $party_id,
+						"case_code" 		=> $obj['case_code'],
+						"contact_type" 		=> $value2['contact_type'],
+						"contact_value" 	=> $value2['contact_type_value'],
+						"extension" 		=> $value2['contact_extension'],
+						"last_update" 		=> date("Y-m-d H:i:s"),
+						"last_update_by" 	=> $obj['user_id'],
+					);
+
+					CN_Parties_Involved_Contact_List::save($record2);
+				endforeach;
+
+				foreach($value['contact_person'] as $key3=>$value3):
+					$record3 = array(
+						"party_id"			=> $party_id,
+						"case_code" 		=> $obj['case_code'],
+						"contact_type" 		=> $value3['contact_type'],
+						"contact_value" 	=> $value3['contact_type_value'],
+						"extension" 		=> $value3['contact_extension'],
+						"last_update" 		=> date("Y-m-d H:i:s"),
+						"last_update_by" 	=> $obj['user_id'],
+					);
+
+					CN_Parties_Involved_Contact_Person_List::save($record3);
+				endforeach;
+
+			endforeach;
+		}
+
 	}
 
 	function delete_party() {
@@ -595,12 +727,64 @@ class Cases extends CI_Controller {
 			$_SESSION['tmp_cases']['incident_description'] = $post;
 			$json['is_successful'] 	= true;
 			$json['message'] 		= "Successfully updated!";
+
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['general']);
+			$this->save_incident_description($case_details);
+
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
 		echo json_encode($json);
+	}
+
+	function save_incident_description($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['incident_description'];
+
+		if($session && $case_code && $obj) {
+			$incident = CN_Incident_Description::findByCaseCode(array("case_code" => $case_code));
+
+			$record = array(
+				"case_id"			 					=> $obj['case_id'],
+				"case_code" 							=> $obj['case_code'],
+				"firm_id" 								=> $obj['firm_id'],
+				"user_id" 								=> $obj['user_id'],
+				"date_time_accident"					=> date("Y-m-d H:i:s",strtotime($session['date_time_accident'])),
+				"location" 								=> $session['location'],
+				"client_position" 						=> $session['client_position'],
+				"client_position_passenger" 			=> $session['client_position_passenger'],
+				"client_position_other" 				=> $session['client_position_other'],
+				"trip_purpose" 							=> $session['trip_purpose'],
+				"involves_workers_compensation" 		=> $session['involves_workers_compensation'],
+				"police_investigated" 					=> $session['police_investigated'],
+				"agency" 								=> $session['agency'],
+				"case_report_number" 					=> $session['case_report_number'],
+				"citations_client" 						=> $session['ci_client_check'],
+				"citations_client_description" 			=> $session['ci_client_text'],
+				"citations_host_driver" 				=> $session['ci_host_driver_check'],
+				"citations_host_driver_description" 	=> $session['ci_host_driver_text'],
+				"citations_adverse_driver" 				=> $session['ci_host_adverse_driver_check'],
+				"citations_adverse_driver_description" 	=> $session['ci_host_adverse_driver_text'],
+				"accident_description" 					=> $session['accident_description'],
+				"vehicles_involved" 					=> $session['vehicles_involved'],
+				"accident_uncontrolled_intersection" 	=> $session['accident_uncontrolled_intersection'],
+				"witnesses" 							=> $session['witnesses'],
+				"last_modified_by" 						=> $obj['user_id'],
+			);
+
+			if($incident) {
+				CN_Incident_Description::save($record, $incident['id']);
+			} else {
+				$arr = array(
+					"date_created" => date("Y-m-d H:i:s",time()),
+				);
+				$record = array_merge($record,$arr);
+				CN_Incident_Description::save($record);
+			}
+		}
 	}
 
 	function insurance() {
@@ -657,12 +841,66 @@ class Cases extends CI_Controller {
 			$json['is_successful'] 	= true;
 			$json['message'] 		= "Successfully updated!";
 
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['insurance']);
+			$this->save_insurance($case_details);
+
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
 		echo json_encode($json);
+	}
+
+	function save_insurance($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['insurance'];
+
+		if($session && $obj && $case_code) {
+
+			$is_deleted = false;
+
+			$insurance = CN_Insurance::findByCaseCode(array("case_code" => $case_code));
+			foreach($session as $key=>$value):
+
+				if($insurance && !$is_deleted) {
+					CN_Insurance::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			 	=> $obj['case_id'],
+					"case_code" 			=> $obj['case_code'],
+					"firm_id" 				=> $obj['firm_id'],
+					"user_id" 				=> $obj['user_id'],
+					"party_type"			=> $value['party_type'],
+					"insurance_type" 		=> $value['insurance_type'],
+					"name_insured" 			=> $value['name_insured'],
+					"insurance_company" 	=> $value['insurance_company'],
+					"policy_number" 		=> $value['policy_number'],
+					"agent_sold_policy" 	=> $value['agent_sold_policy'],
+					"adjuster" 				=> $value['adjuster'],
+					"address" 				=> $value['address'],
+					"city" 					=> $value['city'],
+					"state" 				=> $value['state'],
+					"zip" 					=> $value['zip'],
+					"phone" 				=> $value['phone'],
+					"extension" 			=> $value['extension'],
+					"claim_number" 			=> $value['claim_number'],
+					"pip_limits" 			=> $value['pip_limits'],
+					"med_pay_limits" 		=> $value['med_pay_limits'],
+					"uninsured_limits" 		=> $value['uninsured_limits'],
+					"underinsured_limits" 	=> $value['underinsured_limits'],
+					"liability_limits" 		=> $value['liability_limits'],
+					"date_created" 			=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 		=> $obj['user_id'],
+				);
+
+				CN_Insurance::save($record);
+
+			endforeach;
+		}
 	}
 
 	function insurance_list() {
@@ -2521,67 +2759,43 @@ class Cases extends CI_Controller {
 		$this->load->view('cases/submit/index',$data);
 	}
 
-	function finalize_user_case() {
-		#$post = $this->validate_ajax_post();
-		#if($post) {
-		debug_array($_SESSION['tmp_cases']);
+	function save_user_case($module) {
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['cnp']['login'];
 
-			$case_code 	= $_SESSION['cases']['code'];
-			$session 	= $_SESSION['cnp']['login'];
+		$user_id = (int) $this->encrypt->decode($session['user_id']);
+		$firm_id = (int) $this->encrypt->decode($session['firm_id']);
+		
+		Timezone::setDefaultTimeZone($firm_id);
 
-			$user_id = (int) $this->encrypt->decode($session['user_id']);
-			$firm_id = (int) $this->encrypt->decode($session['firm_id']);
-			
-			Timezone::setDefaultTimeZone($firm_id);
-
+		$case = CN_Case::findByCaseCode(array("case_code" => $case_code));
+		if(!$case) {
 			$record = array(
 				"firm_id" 		=> $firm_id,
 				"user_id" 		=> $user_id,
 				"case_code" 	=> $case_code,
-				"status" 		=> ACTIVE,
+				"state" 		=> PENDING,
 				"is_archive" 	=> YES,
-				"date_created" 	=> date("Y-m-d H:i:s"),
+				"date_created" 	=> date("Y-m-d H:i:s",time()),
 				"modified_by" 	=> $user_id,
 			);
 
 			$case_id = CN_Case::save($record);
-
-			$case_details = array(
-				"case_id" 		=> $case_id,
-				"case_code" 	=> $case_code,
-				"firm_id" 		=> $firm_id,
-				"user_id" 		=> $user_id,
-			);
-			
-			$this->save_general_info($case_details);
-		#}
-	}
-
-
-	function save_general_info($obj) {
-
-		$case_code 	= $_SESSION['cases']['code'];
-		$session 	= $_SESSION['tmp_cases']['general'];
-
-		if($session) {
-			$record = array(
-				"case_id"			 				=> $obj['case_id'],
-				"case_code" 						=> $obj['case_code'],
-				"firm_id" 							=> $obj['firm_id'],
-				"user_id" 							=> $obj['user_id'],
-				"investigator_name"					=> $session['investigator_name'],
-				"investigation_date" 				=> $session['investigation_date'],
-				"case_source" 						=> $session['case_source'],
-				"referral_source" 					=> $session['referral_source'],
-				"previous_representation" 			=> $session['previous_representation'],
-				"reasons_representation_terminated" => $session['reasons_representation_terminated'],
-				"settlement_received" 				=> $session['settlement_received'],
-				"date_created" 						=> date("Y-m-d H:i:s"),
-				"last_modified_by" 					=> $obj['user_id'],
-			);
-
-			CN_General_Information::save($record);
+		} else {
+			$case_id = $case['id'];
 		}
+
+		Timezone::setDefaultTimeZone($firm_id);
+
+		$case_details = array(
+			"case_id" 		=> $case_id,
+			"case_code" 	=> $case_code,
+			"firm_id" 		=> $firm_id,
+			"user_id" 		=> $user_id,
+		);
+		
+		return $case_details;
+		
 	}
 
 	function save_parties($obj) {
