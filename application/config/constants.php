@@ -67,6 +67,22 @@ define('CNP_CASE_PARTIES_INVOLVED_CONTACT_LIST','cnp_case_parties_involved_conta
 define('CNP_CASE_PARTIES_INVOLVED_CONTACT_PERSON_LIST','cnp_case_parties_involved_contact_person_list');
 define('CNP_CASE_INCIDENT_DESCRIPTION','cnp_case_incident_description');
 define('CNP_CASE_INSURANCE','cnp_case_insurance');
+define('CNP_CASE_VEHICLES','cnp_case_vehicles');
+define('CNP_CASE_INJURIES_TREATMENT','cnp_case_injuries_treatment');
+define('CNP_CASE_INJ_AMBULANCE','cnp_case_inj_ambulance');
+define('CNP_CASE_INJ_HOSPITAL_ER','cnp_case_inj_hospital_er');
+define('CNP_CASE_INJ_URGENT_CARE_CLINIC','cnp_case_inj_urgent_care_clinic');
+define('CNP_CASE_INJ_IMAGING_CENTER','cnp_case_inj_imaging_center');
+define('CNP_CASE_INJ_DOCTOR','cnp_case_inj_doctor');
+define('CNP_CASE_INJ_CHIROPRACTOR','cnp_case_inj_chiropractor');
+define('CNP_CASE_INJ_THERAPIST','cnp_case_inj_therapist');
+define('CNP_CASE_INJ_REFERRED_CLIENT','cnp_case_inj_referred_client');
+define('CNP_CASE_INJ_MEDICAL_PROVIDER','cnp_case_inj_medical_provider');
+define('CNP_CASE_INJ_MEDICAL_PREEX_MEDICAL_CONDITION','cnp_case_inj_preex_medical_condition');
+define('CNP_CASE_INJ_SUBSEQUENT_ACCIDENT','cnp_case_inj_subsequent_accident');
+define('CNP_CASE_ECONOMIC_DAMAGE','cnp_case_economic_damage');
+define('CNP_CASE_INVESTIGATORS_NOTE','cnp_case_investigators_note');
+
 
 define('CNP_CASE','cnp_case');
 define('CNP_CASE_GENERAL_INFORMATION','cnp_case_general_information');

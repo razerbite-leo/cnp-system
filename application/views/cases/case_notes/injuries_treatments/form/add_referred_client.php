@@ -4,7 +4,7 @@
         $('.tipsy-inner').remove();
       }
 
-       $('#when_dtp').datetimepicker({
+       $('#when_referred_client_dtp').datetimepicker({
         pickTime: false
       });
       
@@ -37,7 +37,7 @@
                 <section class="clear"></section>
 
                 <p>When</p>
-                <div id="when_dtp" class="input-append">
+                <div id="when_referred_client_dtp" class="input-append">
                   <input type="text" id="when" name="when" class="party_form" data-format="yyyy-MM-dd"></input>
                   <span class="add-on">
                     <i data-time-icon="icon-time" data-date-icon="icon-calendar">

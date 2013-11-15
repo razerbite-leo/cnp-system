@@ -4,7 +4,7 @@
         $('.tipsy-inner').remove();
       }
 
-       $('#edit_when_dtp').datetimepicker({
+       $('#edit_when_subsequent_accident_dtp').datetimepicker({
         pickTime: false
       });
       
@@ -38,7 +38,7 @@
                 <section class="clear"></section>
 
                 <p>When</p>
-                <div id="edit_when_dtp" class="input-append">
+                <div id="edit_when_subsequent_accident_dtp" class="input-append">
                   <input type="text" id="when" name="when" class="party_form" data-format="yyyy-MM-dd" value="<?php echo $sa['when']; ?>"></input>
                   <span class="add-on">
                     <i data-time-icon="icon-time" data-date-icon="icon-calendar">

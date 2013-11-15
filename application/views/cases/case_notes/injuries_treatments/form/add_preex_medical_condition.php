@@ -4,7 +4,7 @@
         $('.tipsy-inner').remove();
       }
 
-       $('#when_dtp').datetimepicker({
+       $('#when_preex_medical_condition').datetimepicker({
         pickTime: false
       });
       
@@ -36,7 +36,7 @@
                 <section class="clear"></section>
 
                 <p>When</p>
-                <div id="when_dtp" class="input-append">
+                <div id="when_preex_medical_condition" class="input-append">
                   <input type="text" id="when" name="when" class="party_form" data-format="yyyy-MM-dd"></input>
                   <span class="add-on">
                     <i data-time-icon="icon-time" data-date-icon="icon-calendar">

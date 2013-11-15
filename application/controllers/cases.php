@@ -1005,7 +1005,7 @@ class Cases extends CI_Controller {
 			} else {
 				$array_count = count($_SESSION['tmp_cases']['vehicles']);
 				$custom_array = array(
-					"id"	   => $array_count,
+					"id"	  => $array_count,
 				);
 				$_SESSION['tmp_cases']['vehicles'][] = array_merge($post,$custom_array);
 			}
@@ -1014,12 +1014,71 @@ class Cases extends CI_Controller {
 			$json['is_successful'] 	= true;
 			$json['message'] 		= "Successfully updated!";
 
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['vehicles']);
+			$this->save_vehicles($case_details);
+
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
 		echo json_encode($json);
+	}
+
+	function save_vehicles($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['vehicles'];
+
+		if($session && $obj && $case_code) {
+
+			$vehicles = CN_Vehicle::findByCaseCode(array("case_code"=>$case_code));
+
+			$is_deleted = false;
+			foreach($session as $key=>$value):
+
+				if($vehicles && !$is_deleted) {
+
+					CN_Vehicle::deleteByCaseCode(array("case_code"=>$case_code));
+					$is_deleted = true;
+				}
+
+				$estimated_cost_market_value = ($value['vehicle_condition'] ==  "Repairable" ? $value['fair_market_value'] : $value['estimated_cost']);
+
+				$record = array(
+					"case_id"			 			=> $obj['case_id'],
+					"case_code" 					=> $obj['case_code'],
+					"firm_id" 						=> $obj['firm_id'],
+					"user_id" 						=> $obj['user_id'],
+					"vehicle_type"			 		=> $value['vehicle_type'],
+					"is_vehicle_rental"			 	=> $value['vehicle_rental'],
+					"party_type"			 		=> $value['party_type'],
+					"party_role" 					=> $value['party_role'],
+					"vehicle" 						=> $value['vehicle'],
+					"registered_owner" 				=> $value['registered_owner'],
+					"make_model"			 		=> $value['make_model'],
+					"license_plate" 				=> $value['license_plate'],
+					"vehicle_color" 				=> $value['vehicle_color'],
+					"damage" 						=> $value['damage'],
+					"vehicle_status" 				=> $value['vehicle_status'],
+					"pt_police" 					=> $value['vh']['police'],
+					"pt_investigator" 				=> $value['vh']['investigator'],
+					"pt_insurance_company"			=> $value['vh']['insurance_company'],
+					"pt_other" 						=> $value['vh']['other'],
+					"pt_client" 					=> $value['vh']['client'],
+					"reason_no_photos" 				=> $value['no_photos_reason'],
+					"vehicle_condition" 			=> $value['vehicle_condition'],
+					"estimated_cost_market_value" 	=> $estimated_cost_market_value,
+					"property_damage_paid" 			=> $value['property_damage_claim_paid'],
+					"paid_by" 						=> $value['paid_by'],
+					"date_created" 					=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 				=> $obj['user_id'],
+				);
+
+				CN_Vehicle::save($record);
+
+			endforeach;
+		}
 	}
 
 	function vehicle_list() {
@@ -2245,11 +2304,6 @@ class Cases extends CI_Controller {
 		unset($_SESSION['tmp_cases']['injuries_treatments']['subsequent_accident'][$id]);
 	}
 
-
-	function debug_session() {
-		debug_array($_SESSION['tmp_cases']);
-	}
-
 	function add_injuries_treatments() {
 		$this->check_user_login();
 		$post = $this->validate_ajax_post();
@@ -2264,12 +2318,322 @@ class Cases extends CI_Controller {
 			
 			$json['is_successful'] 	= true;
 			$json['message'] 		= "Successfully updated!";
+
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['injuries_treatments']);
+			$this->save_injuries_treatments($case_details);
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
 		echo json_encode($json);
+	}
+
+	function save_injuries_treatments($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['injuries_treatments'];
+
+		$obj = $this->save_user_case($_SESSION['tmp_cases']['injuries_treatments']);
+		
+		if($session && $obj && $case_code) {
+			$it = CN_General_Information::findByCaseCode(array("case_code" => $case_code));
+
+			$record = array(
+				"case_id"			 				=> $obj['case_id'],
+				"case_code" 						=> $obj['case_code'],
+				"firm_id" 							=> $obj['firm_id'],
+				"user_id" 							=> $obj['user_id'],
+				"symptoms_relates_accident"			=> $session['symptoms_relates_accident'],
+				"last_modified_by" 					=> $obj['user_id'],
+			);
+
+			if($it) {
+				CN_Injuries_Treatment::save($record, $it['id']);
+			} else {
+				$arr = array(
+					"date_created" => date("Y-m-d H:i:s",time()),
+				);
+				$record = array_merge($record,$arr);
+				CN_Injuries_Treatment::save($record);
+			}
+
+			$ambulance 	= CN_Inj_Ambulance::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted	= false;
+
+			foreach($session['ambulance'] as $key=>$value):
+				if($ambulance && !$is_deleted) {
+					CN_Inj_Ambulance::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"ambulance" 		=> $value['ambulance'],
+					"date_when" 		=> $value['when'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Ambulance::save($record);
+
+			endforeach;
+
+			$hospital_er 	= CN_Inj_Ambulance::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted	= false;
+
+			foreach($session['hospital_er'] as $key=>$value):
+				if($hospital_er && !$is_deleted) {
+					CN_Inj_Hospital_Er::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"hospital_name" 	=> $value['hospital_name'],
+					"date_when" 		=> $value['when'],
+					"x_ray" 			=> $value['exam']['x_ray'],
+					"ct_scan" 			=> $value['exam']['ct_scan'],
+					"mri" 				=> $value['exam']['mri'],
+					"prescription_medication" => $value['exam']['prescription_medication'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Hospital_Er::save($record);
+
+			endforeach;
+
+			$urgent_care_clinic = CN_Inj_Urgent_Care_Clinic::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted	= false;
+
+			foreach($session['urgent_care_clinic'] as $key=>$value):
+				if($urgent_care_clinic && !$is_deleted) {
+					CN_Inj_Urgent_Care_Clinic::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"clinic_name" 		=> $value['clinic_name'],
+					"date_when" 		=> $value['when'],
+					"x_ray" 			=> $value['exam']['x_ray'],
+					"ct_scan" 			=> $value['exam']['ct_scan'],
+					"mri" 				=> $value['exam']['mri'],
+					"prescription_medication" => $value['exam']['prescription_medication'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Urgent_Care_Clinic::save($record);
+
+			endforeach;
+
+			$imaging_center = CN_Inj_Urgent_Imaging_Center::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted	= false;
+
+			foreach($session['imaging_center'] as $key=>$value):
+				if($imaging_center && !$is_deleted) {
+					CN_Inj_Urgent_Imaging_Center::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"center_name" 		=> $value['center_name'],
+					"date_when" 		=> $value['when'],
+					"x_ray" 			=> $value['exam']['x_ray'],
+					"ct_scan" 			=> $value['exam']['ct_scan'],
+					"mri" 				=> $value['exam']['mri'],
+					"prescription_medication" => $value['exam']['prescription_medication'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Urgent_Imaging_Center::save($record);
+			endforeach;
+
+			$doctor 	= CN_Inj_Doctor::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted	= false;
+
+			foreach($session['doctors'] as $key=>$value):
+				if($doctor && !$is_deleted) {
+					CN_Inj_Doctor::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"doctor_name" 		=> $value['doctor_name'],
+					"date_when" 		=> $value['when'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Doctor::save($record);
+
+			endforeach;
+
+			$chiropractor 	= CN_Inj_Chiropractor::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted		= false;
+
+			foreach($session['chiropractors'] as $key=>$value):
+				if($chiropractor && !$is_deleted) {
+					CN_Inj_Chiropractor::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"chiropractor_name" => $value['chiropractor'],
+					"date_when" 		=> $value['when'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Chiropractor::save($record);
+
+			endforeach;
+
+			$therapist 	= CN_Inj_Therapist::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted	= false;
+
+			foreach($session['therapists'] as $key=>$value):
+				if($therapist && !$is_deleted) {
+					CN_Inj_Therapist::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"			=> $obj['case_id'],
+					"case_code" 		=> $obj['case_code'],
+					"firm_id" 			=> $obj['firm_id'],
+					"user_id" 			=> $obj['user_id'],
+					"therapist_name" 	=> $value['therapist_name'],
+					"date_when" 		=> $value['when'],
+					"date_created" 		=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 	=> $obj['user_id'],
+				);
+
+				CN_Inj_Therapist::save($record);
+
+			endforeach;
+
+			$referred_client 	= CN_Inj_Referred_Client::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted			= false;
+
+			foreach($session['referred_client'] as $key=>$value):
+				if($referred_client && !$is_deleted) {
+					CN_Inj_Referred_Client::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"				=> $obj['case_id'],
+					"case_code" 			=> $obj['case_code'],
+					"firm_id" 				=> $obj['firm_id'],
+					"user_id" 				=> $obj['user_id'],
+					"referred_client_name" 	=> $value['referred_client'],
+					"date_when" 			=> $value['when'],
+					"date_created" 			=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 		=> $obj['user_id'],
+				);
+
+				CN_Inj_Referred_Client::save($record);
+
+			endforeach;
+
+			$medical_provider 	= CN_Inj_Medical_Provider::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted			= false;
+
+			foreach($session['medical_provider'] as $key=>$value):
+				if($medical_provider && !$is_deleted) {
+					CN_Inj_Medical_Provider::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"				=> $obj['case_id'],
+					"case_code" 			=> $obj['case_code'],
+					"firm_id" 				=> $obj['firm_id'],
+					"user_id" 				=> $obj['user_id'],
+					"medical_provider_name" => $value['medical_provider'],
+					"date_when" 			=> $value['when'],
+					"date_created" 			=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 		=> $obj['user_id'],
+				);
+
+				CN_Inj_Medical_Provider::save($record);
+
+			endforeach;
+
+			$preex_medical_condition 	= CN_Inj_Preex_Medical_Condition::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted					= false;
+
+			foreach($session['preex_medical_condition'] as $key=>$value):
+				if($preex_medical_condition && !$is_deleted) {
+					CN_Inj_Preex_Medical_Condition::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"					=> $obj['case_id'],
+					"case_code" 				=> $obj['case_code'],
+					"firm_id" 					=> $obj['firm_id'],
+					"user_id" 					=> $obj['user_id'],
+					"preex_medical_condition" 	=> $value['preex_medical_condition'],
+					"date_when" 				=> $value['when'],
+					"date_created" 				=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 			=> $obj['user_id'],
+				);
+
+				CN_Inj_Preex_Medical_Condition::save($record);
+
+			endforeach;
+
+			$subsequent_accident 	= CN_Inj_Preex_Subsequent_Accident::findByCaseCode(array("case_code" => $case_code));
+			$is_deleted				= false;
+
+			foreach($session['subsequent_accident'] as $key=>$value):
+				if($subsequent_accident && !$is_deleted) {
+					CN_Inj_Preex_Subsequent_Accident::deleteByCaseCode(array("case_code" => $case_code));
+					$is_deleted = true;
+				}
+
+				$record = array(
+					"case_id"				=> $obj['case_id'],
+					"case_code" 			=> $obj['case_code'],
+					"firm_id" 				=> $obj['firm_id'],
+					"user_id" 				=> $obj['user_id'],
+					"subsequent_accident" 	=> $value['subsequent_accident'],
+					"date_when" 			=> $value['when'],
+					"date_created" 			=> date("Y-m-d H:i:s",time()),
+					"last_modified_by" 		=> $obj['user_id'],
+				);
+
+				CN_Inj_Preex_Subsequent_Accident::save($record);
+
+			endforeach;
+
+		}
 	}
 
 	function economic_damages() {
@@ -2312,12 +2676,55 @@ class Cases extends CI_Controller {
 			$_SESSION['tmp_cases']['economic_damages'] = $post;
 			$json['is_successful'] 	= true;
 			$json['message'] 		= "Successfully updated!";
+
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['economic_damages']);
+			$this->save_economic_damages($case_details);
+
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
 		echo json_encode($json);
+	}
+
+	function save_economic_damages($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['economic_damages'];
+
+		if($session && $obj && $case_code) {
+
+			$economic_damage = CN_Economic_Damage::findByCaseCode(array("case_code" => $case_code));
+
+			$record = array(
+				"case_id"			 	=> $obj['case_id'],
+				"case_code" 			=> $obj['case_code'],
+				"firm_id" 				=> $obj['firm_id'],
+				"user_id" 				=> $obj['user_id'],
+				"employer"				=> $session['employer'],
+				"address" 				=> $session['address'],
+				"city" 					=> $session['city'],
+				"state" 				=> $session['state'],
+				"zip" 					=> $session['zip'],
+				"supervisor_name" 		=> $session['supervisor_name'],
+				"salary_wages" 			=> $session['salary_wages'],
+				"doctor_restricted" 	=> $session['doctor_restricted'],
+				"date_restricted" 		=> $session['date_restricted'],
+				"last_modified_by" 		=> $obj['user_id'],
+			);
+
+			if($economic_damage) {
+				CN_Economic_Damage::save($record, $economic_damage['id']);
+			} else {
+				$arr = array(
+					"date_created" => date("Y-m-d H:i:s",time()),
+				);
+				$record = array_merge($record,$arr);
+				CN_Economic_Damage::save($record);
+			}
+
+		}
 	}
 
 	function notes() {
@@ -2348,12 +2755,46 @@ class Cases extends CI_Controller {
 			$_SESSION['tmp_cases']['notes'] = $post;
 			$json['is_successful'] 	= true;
 			$json['message'] 		= "Successfully updated!";
+
+			$case_details = $this->save_user_case($_SESSION['tmp_cases']['notes']);
+			$this->save_investigator_notes($case_details);
+
 		} else {
 			$json['is_successful'] 	= false;
 			$json['message']		= "Ooop! Error adding to database. Please contact web administrator!";
 		}
 
 		echo json_encode($json);
+	}
+
+	function save_investigator_notes($obj) {
+
+		$case_code 	= $_SESSION['cases']['code'];
+		$session 	= $_SESSION['tmp_cases']['notes'];
+
+		if($session && $obj && $case_code) {
+
+			$investigators_note = CN_Investigators_Note::findByCaseCode(array("case_code" => $case_code));
+
+			$record = array(
+				"case_id"			=> $obj['case_id'],
+				"case_code" 		=> $obj['case_code'],
+				"firm_id" 			=> $obj['firm_id'],
+				"user_id" 			=> $obj['user_id'],
+				"note_content"		=> $session['investigator_note'],
+				"last_modified_by" 	=> $obj['user_id'],
+			);
+
+			if($investigators_note) {
+				CN_Investigators_Note::save($record, $investigators_note['id']);
+			} else {
+				$arr = array(
+					"date_created" => date("Y-m-d H:i:s",time()),
+				);
+				$record = array_merge($record,$arr);
+				CN_Investigators_Note::save($record);
+			}
+		}
 	}
 
 	function validate_ajax_post() {
